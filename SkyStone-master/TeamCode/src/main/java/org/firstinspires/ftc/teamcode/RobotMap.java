@@ -54,20 +54,21 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class RobotMap
 {
     /* Public OpMode members. */
-    public static DcMotor leftSlide = null;
-    public static DcMotor rightSlide = null;
-    public static Servo leftClaw = null;
-    public static Servo rightClaw = null;
-    public static Servo hookRight = null;
-    public static Servo hookLeft = null;
-    public static Servo pinchRight = null;
-    public static Servo rightGate = null;
-    public static Servo leftGate = null;
+
 
 
     /* local OpMode members. */
-    HardwareMap hwMap = null;
-    private ElapsedTime period = new ElapsedTime();
+    HardwareMap hwMap           =  null;
+    private ElapsedTime period  = new ElapsedTime();
+    public static DcMotor leftSlide;
+    public static DcMotor rightSlide;
+    public static Servo leftClaw;
+    public static Servo rightClaw;
+    public static Servo hookRight;
+    public static Servo hookLeft;
+    public static Servo pinchRight;
+    public static Servo rightGate;
+    public static Servo leftGate;
 
     /* Constructor */
     public RobotMap(){

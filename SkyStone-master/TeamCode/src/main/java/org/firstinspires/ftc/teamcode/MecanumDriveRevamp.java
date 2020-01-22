@@ -62,6 +62,7 @@ public class MecanumDriveRevamp extends LinearOpMode {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
     DriveTrain driveTrain = new DriveTrain();
+    FoundationHook fndHook = new FoundationHook();
     RobotMap robotMap = new RobotMap();
     double direction_y;
     double direction_x;
@@ -75,7 +76,6 @@ public class MecanumDriveRevamp extends LinearOpMode {
     @Override
     public void runOpMode() {
         driveTrain.init(hardwareMap);
-        robotMap.init(hardwareMap);
 
         invertDrive = 1;
         percentSpeed = 1;
