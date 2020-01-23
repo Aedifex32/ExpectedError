@@ -109,12 +109,12 @@ public class BlueFoundationAuto extends LinearOpMode {
         driveTrain.BLMotor.setPower(FORWARD_SPEED);
         sleep(2000);
         //stop right side motion to start to turn
-        driveTrain.FRMotor.setPower(0);
-        driveTrain.BRMotor.setPower(0);
-        sleep(2000);
-        //stop motion
         driveTrain.FLMotor.setPower(0);
         driveTrain.BLMotor.setPower(0);
+        sleep(2000);
+        //stop motion
+        driveTrain.FRMotor.setPower(0);
+        driveTrain.BRMotor.setPower(0);
         sleep(500);
         //release foundation
         robotMap.rightGate.setPosition(1);
@@ -126,6 +126,11 @@ public class BlueFoundationAuto extends LinearOpMode {
         driveTrain.FLMotor.setPower(FORWARD_SPEED);
         driveTrain.BLMotor.setPower(FORWARD_SPEED);
         sleep(500);
+        //stop motion
+        driveTrain.FRMotor.setPower(0);
+        driveTrain.BRMotor.setPower(0);
+        driveTrain.FLMotor.setPower(0);
+        driveTrain.BLMotor.setPower(0);
         //put gates back down
         robotMap.rightGate.setPosition(0.5);
         robotMap.leftGate.setPosition(0.4);
@@ -136,6 +141,18 @@ public class BlueFoundationAuto extends LinearOpMode {
         driveTrain.FLMotor.setPower(BACKWARD_SPEED);
         driveTrain.BLMotor.setPower(BACKWARD_SPEED);
         sleep(2500);
+        //stop motion
+        driveTrain.FRMotor.setPower(0);
+        driveTrain.BRMotor.setPower(0);
+        driveTrain.FLMotor.setPower(0);
+        driveTrain.BLMotor.setPower(0);
+        sleep(500);
+        //move away from foundation
+        driveTrain.FRMotor.setPower(FORWARD_SPEED);
+        driveTrain.BRMotor.setPower(FORWARD_SPEED);
+        driveTrain.FLMotor.setPower(FORWARD_SPEED);
+        driveTrain.BLMotor.setPower(FORWARD_SPEED);
+        sleep(500);
         //stop motion
         driveTrain.FRMotor.setPower(0);
         driveTrain.BRMotor.setPower(0);

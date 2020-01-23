@@ -1,4 +1,4 @@
-/* Copyright (c) 2019 FIRST. All rights reserved.
+/* Copyright (c) 2017 FIRST. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided that
@@ -30,142 +30,160 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection;
-import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
-
-import java.util.List;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
- * This 2019-2020 OpMode illustrates the basics of using the TensorFlow Object Detection API to
- * determine the position of the Skystone game elements.
+ * This file illustrates the concept of driving a path based on time.
+ * It uses the common Pushbot hardware class to define the drive on the robot.
+ * The code is structured as a LinearOpMode
  *
- * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list.
+ * The code assumes that you do NOT have encoders on the wheels,
+ *   otherwise you would use: PushbotAutoDriveByEncoder;
  *
- * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
- * is explained below.
+ *   The desired path in this example is:
+ *   - Drive forward for 3 seconds
+ *   - Spin right for 1.3 seconds
+ *   - Drive Backwards for 1 Second
+ *   - Stop and close the claw.
+ *
+ *  The code is written in a simple form with no optimizations.
+ *  However, there are several ways that this type of sequence could be streamlined,
+ *
+ * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
+ * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
-@TeleOp(name = "Red Foundation (Red Alliance)", group = "Concept")
+
+@Autonomous(name="Red Foundation (Red Alliance)", group="Pushbot")
 public class RedFoundationAuto extends LinearOpMode {
-    private static final String TFOD_MODEL_ASSET = "Skystone.tflite";
-    private static final String LABEL_FIRST_ELEMENT = "Stone";
-    private static final String LABEL_SECOND_ELEMENT = "Skystone";
 
-    /*
-     * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
-     * 'parameters.vuforiaLicenseKey' is initialized is for illustration only, and will not function.
-     * A Vuforia 'Development' license key, can be obtained free of charge from the Vuforia developer
-     * web site at https://developer.vuforia.com/license-manager.
-     *
-     * Vuforia license keys are always 380 characters long, and look as if they contain mostly
-     * random data. As an example, here is a example of a fragment of a valid key:
-     *      ... yIgIzTqZ4mWjk9wd3cZO9T1axEqzuhxoGlfOOI2dRzKS4T0hQ8kT ...
-     * Once you've obtained a license key, copy the string from the Vuforia web site
-     * and paste it in to your code on the next line, between the double quotes.
-     */
-    private static final String VUFORIA_KEY =
-            "ATROGL7/////AAABmRHlIwx/mU3zmbqmpeWGYGFxOFnaKid9ItnJGmZ0SN8xcbZ+ByZ9G+DJdSEbR2ofaUhYGlena+/LqHGQoDhyq4jJlAC8fI8UyzW6PzVb5P7ZQjcnP5q7edKr3Y4mfj0NE/SsWHPP7Wz3MamAHfvUqisd5/MoGSYH5NKRuxHVNTxHq6NOITTe6CHZPySCjzDy2vB6q5BWLrU73svg+HI0fg74arONvhhDxIG800jfcu244+qc0OCPQXxD/dUAIe2usCpVQl3qJUY0Vj3hfNGrO63f8ds1cUDB+oH+QBoj0JWkwPAT/AYUwkoFPIeiIAXDEpvzjrtV5Hz/er39b64I9OxCO0/JgOaVUoz9CCmldxaA";
+    /* Declare OpMode members. */
+    DriveTrain driveTrain = new DriveTrain();
+    RobotMap robotMap = new RobotMap();
+    private ElapsedTime     runtime = new ElapsedTime();
 
-    /**
-     * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
-     * localization engine.
-     */
-    private VuforiaLocalizer vuforia;
-
-    /**
-     * {@link #tfod} is the variable we will use to store our instance of the TensorFlow Object
-     * Detection engine.
-     */
-    private TFObjectDetector tfod;
+    static final double     FORWARD_SPEED = 0.75;
+    static final double     BACKWARD_SPEED = -0.75;
+    static final double     TURN_SPEED    = 0.6;
 
     @Override
     public void runOpMode() {
-        // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
-        // first.
-        initVuforia();
 
-        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
-            initTfod();
-        } else {
-            telemetry.addData("Sorry!", "This device is not compatible with TFOD");
-        }
+        /*
+         * Initialize the drive system variables.
+         * The init() method of the hardware class does all the work here
+         */
+        driveTrain.init(hardwareMap);
+        robotMap.init(hardwareMap);
 
-        /**
-         * Activate TensorFlow Object Detection before we wait for the start command.
-         * Do it here so that the Camera Stream window will have the TensorFlow annotations visible.
-         **/
-        if (tfod != null) {
-            tfod.activate();
-        }
-
-        /** Wait for the game to begin */
-        telemetry.addData(">", "Press Play to start op mode");
+        // Send telemetry message to signify robot waiting;
+        telemetry.addData("Status", "Ready to run");    //
         telemetry.update();
+
+        // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        if (opModeIsActive()) {
-            while (opModeIsActive()) {
-                if (tfod != null) {
-                    // getUpdatedRecognitions() will return null if no new information is available since
-                    // the last time that call was made.
-                    List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-                    if (updatedRecognitions != null) {
-                      telemetry.addData("# Object Detected", updatedRecognitions.size());
+        //drive to foundation
+        driveTrain.FRMotor.setPower(BACKWARD_SPEED);
+        driveTrain.BRMotor.setPower(BACKWARD_SPEED);
+        driveTrain.FLMotor.setPower(BACKWARD_SPEED);
+        driveTrain.BLMotor.setPower(BACKWARD_SPEED);
+        sleep(3000);
+        //stop motion
+        driveTrain.FRMotor.setPower(0);
+        driveTrain.BRMotor.setPower(0);
+        driveTrain.FLMotor.setPower(0);
+        driveTrain.BLMotor.setPower(0);
+        sleep(500);
+        //hook onto foundation
+        robotMap.rightGate.setPosition(0.5);
+        robotMap.leftGate.setPosition(0.4);
+        sleep(1000);
+        //move towards wall
+        driveTrain.FRMotor.setPower(FORWARD_SPEED);
+        driveTrain.BRMotor.setPower(FORWARD_SPEED);
+        driveTrain.FLMotor.setPower(FORWARD_SPEED);
+        driveTrain.BLMotor.setPower(FORWARD_SPEED);
+        sleep(2000);
+        //stop right side motion to start to turn
+        driveTrain.FRMotor.setPower(0);
+        driveTrain.BRMotor.setPower(0);
+        sleep(2000);
+        //stop motion
+        driveTrain.FLMotor.setPower(0);
+        driveTrain.BLMotor.setPower(0);
+        sleep(500);
+        //release foundation
+        robotMap.rightGate.setPosition(1);
+        robotMap.leftGate.setPosition(0);
+        sleep(1000);
+        //move away from the foundation an inch or so
+        driveTrain.FRMotor.setPower(FORWARD_SPEED);
+        driveTrain.BRMotor.setPower(FORWARD_SPEED);
+        driveTrain.FLMotor.setPower(FORWARD_SPEED);
+        driveTrain.BLMotor.setPower(FORWARD_SPEED);
+        sleep(500);
+        //stop motion
+        driveTrain.FRMotor.setPower(0);
+        driveTrain.BRMotor.setPower(0);
+        driveTrain.FLMotor.setPower(0);
+        driveTrain.BLMotor.setPower(0);
+        //put gates back down
+        robotMap.rightGate.setPosition(0.5);
+        robotMap.leftGate.setPosition(0.4);
+        sleep(1000);
+        //push foundation to corner
+        driveTrain.FRMotor.setPower(BACKWARD_SPEED);
+        driveTrain.BRMotor.setPower(BACKWARD_SPEED);
+        driveTrain.FLMotor.setPower(BACKWARD_SPEED);
+        driveTrain.BLMotor.setPower(BACKWARD_SPEED);
+        sleep(2500);
+        //stop motion
+        driveTrain.FRMotor.setPower(0);
+        driveTrain.BRMotor.setPower(0);
+        driveTrain.FLMotor.setPower(0);
+        driveTrain.BLMotor.setPower(0);
+        sleep(500);
+        //move away from foundation
+        driveTrain.FRMotor.setPower(FORWARD_SPEED);
+        driveTrain.BRMotor.setPower(FORWARD_SPEED);
+        driveTrain.FLMotor.setPower(FORWARD_SPEED);
+        driveTrain.BLMotor.setPower(FORWARD_SPEED);
+        sleep(500);
+        //stop motion
+        driveTrain.FRMotor.setPower(0);
+        driveTrain.BRMotor.setPower(0);
+        driveTrain.FLMotor.setPower(0);
+        driveTrain.BLMotor.setPower(0);
+        sleep(500);
+        //strafe towards wall
+        double magnitude = 1;
+        double angle = Math.atan2(-1 , 0) * (180 / Math.PI);
+        double rotation = 0;
+        double invertDrive = 1;
+        double percentSpeed = 0.75;
+        DriveTrain.drivePolar(magnitude, angle, rotation, invertDrive, percentSpeed);
+        sleep(2000);
+        //stop motion
+        driveTrain.FRMotor.setPower(0);
+        driveTrain.BRMotor.setPower(0);
+        driveTrain.FLMotor.setPower(0);
+        driveTrain.BLMotor.setPower(0);
+        sleep(500);
+        //drive to under bridge
+        driveTrain.FRMotor.setPower(FORWARD_SPEED);
+        driveTrain.BRMotor.setPower(FORWARD_SPEED);
+        driveTrain.FLMotor.setPower(FORWARD_SPEED);
+        driveTrain.BLMotor.setPower(FORWARD_SPEED);
+        sleep(2000);
+        //stop motion and end autonomous
+        driveTrain.FRMotor.setPower(0);
+        driveTrain.BRMotor.setPower(0);
+        driveTrain.FLMotor.setPower(0);
+        driveTrain.BLMotor.setPower(0);
 
-                      // step through the list of recognitions and display boundary info.
-                      int i = 0;
-                      for (Recognition recognition : updatedRecognitions) {
-                        telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
-                        telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
-                                          recognition.getLeft(), recognition.getTop());
-                        telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
-                                recognition.getRight(), recognition.getBottom());
-                      }
-                      telemetry.update();
-                    }
-                }
-            }
-        }
-
-        if (tfod != null) {
-            tfod.shutdown();
-        }
-    }
-
-    /**
-     * Initialize the Vuforia localization engine.
-     */
-    private void initVuforia() {
-        /*
-         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
-         */
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
-
-        parameters.vuforiaLicenseKey = VUFORIA_KEY;
-        parameters.cameraDirection = CameraDirection.BACK;
-
-        //  Instantiate the Vuforia engine
-        vuforia = ClassFactory.getInstance().createVuforia(parameters);
-
-        // Loading trackables is not necessary for the TensorFlow Object Detection engine.
-    }
-
-    /**
-     * Initialize the TensorFlow Object Detection engine.
-     */
-    private void initTfod() {
-        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
-            "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minimumConfidence = 0.8;
-        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
-        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
+        telemetry.addData("Path", "Complete");
+        telemetry.update();
+        sleep(1000);
     }
 }
