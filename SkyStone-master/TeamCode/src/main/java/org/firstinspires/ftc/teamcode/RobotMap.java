@@ -60,7 +60,6 @@ public class RobotMap
     /* local OpMode members. */
     HardwareMap hwMap           =  null;
     private ElapsedTime period  = new ElapsedTime();
-    public static DcMotor leftSlide;
     public static DcMotor rightSlide;
     public static Servo leftClaw;
     public static Servo rightClaw;
@@ -79,7 +78,7 @@ public class RobotMap
     public void init(HardwareMap ahwMap) {
         // Save reference to Hardware map
         hwMap = ahwMap;
-        leftSlide = hwMap.get(DcMotor.class, "left_slide");
+
         rightSlide = hwMap.get(DcMotor.class, "right_slide");
         leftClaw = hwMap.get(Servo.class, "left_claw");
         rightClaw = hwMap.get(Servo.class, "right_claw");
@@ -89,11 +88,9 @@ public class RobotMap
         rightGate = hwMap.get(Servo.class, "right_gate");
         leftGate = hwMap.get(Servo.class, "left_gate");
 
-        leftSlide.setPower(0);
-        rightSlide.setPower(0);
-
-        leftSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        rightSlide.setPower(0);
 
         leftClaw.setPosition(1);
         rightClaw.setPosition(0);
