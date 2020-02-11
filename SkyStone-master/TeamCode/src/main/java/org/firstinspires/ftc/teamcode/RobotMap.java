@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -68,6 +69,7 @@ public class RobotMap
     public static Servo pinchRight;
     public static Servo rightGate;
     public static Servo leftGate;
+    public static ColorSensor colourSensor;
 
     /* Constructor */
     public RobotMap(){
@@ -87,6 +89,7 @@ public class RobotMap
         pinchRight = hwMap.get(Servo.class, "pinch_right");
         rightGate = hwMap.get(Servo.class, "right_gate");
         leftGate = hwMap.get(Servo.class, "left_gate");
+        colourSensor = hwMap.get(ColorSensor.class, "colour_sensor");
 
         rightSlide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
