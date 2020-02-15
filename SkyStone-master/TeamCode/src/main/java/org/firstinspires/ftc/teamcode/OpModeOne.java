@@ -54,7 +54,7 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
  */
 
 @TeleOp(name="Basic: Linear OpMode", group="Linear Opmode")
-
+@Disabled
 public class OpModeOne extends LinearOpMode {
 
     // Declare OpMode members.
