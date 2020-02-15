@@ -69,8 +69,8 @@ public class MecanumDriveRevamp extends LinearOpMode {
     double DEADZONE = 0.1;
     double magnitude;
     double angle;
-    double invertDrive;
-    double percentSpeed;
+    double invertDrive = 1;
+    double percentSpeed = 1;
 
     @Override
     public void runOpMode() {
