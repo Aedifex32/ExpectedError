@@ -35,6 +35,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /*
 This file contains an autonomous program that you can use to test the hue values of different parts of the field we want to see.
 I need you to put the colour sensor over the red bridge line, the blue bridge line, and the grey mats.
@@ -49,13 +52,12 @@ public class ColourSensorTest extends LinearOpMode {
     DriveTrain driveTrain = new DriveTrain();
     RobotMap robotMap = new RobotMap();
     private ElapsedTime     runtime = new ElapsedTime();
-    int Red[] = {0, 0, 0, 0, 0};
-    int Green[] = {0, 0, 0, 0, 0};
-    int Blue[] = {0, 0, 0, 0, 0};
+    List<Integer> Red = new ArrayList<>();
+    List<Integer> Green = new ArrayList<>();
+    List<Integer> Blue = new ArrayList<>();
     float hsvValues[] = {0F, 0F, 0F};
     final float values[] = hsvValues;
     final double SCALE_FACTOR = 255;
-    int i = 0;
 
     @Override
     public void runOpMode() {
@@ -74,22 +76,24 @@ public class ColourSensorTest extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         while(opModeIsActive()) {
-            if (i < 5) {
-                Red[i] = robotMap.colourSensor.red();
-                Green[i] = robotMap.colourSensor.green();
-                Blue[i] = robotMap.colourSensor.blue();
-                i++;
-            }
+
+            Red.add(robotMap.colourSensor.red());
+            Green.add(robotMap.colourSensor.green());
+            Blue.add(robotMap.colourSensor.blue());
+
+
             Color.RGBToHSV((int) (robotMap.colourSensor.red() * SCALE_FACTOR),
                     (int) (robotMap.colourSensor.green() * SCALE_FACTOR),
                     (int) (robotMap.colourSensor.blue() * SCALE_FACTOR),
                     hsvValues);
 
-            if(i >= 5){
-                telemetry.addData("Red Hues", Red);
-                telemetry.addData("Green Hues", Green);
-                telemetry.addData("Blue Hues", Blue);
-            }
+            List<Integer> RedHues = new ArrayList<Integer>(Red);
+            List<Integer> GreenHues = new ArrayList<Integer>(Green);
+            List<Integer> BlueHues = new ArrayList<Integer>(Blue);
+
+            telemetry.addData("Red Hues", RedHues);
+            telemetry.addData("Green Hues", GreenHues);
+            telemetry.addData("Blue Hues", BlueHues);
             telemetry.addData("Total Hue", hsvValues[0]);
             telemetry.update();
             sleep(1000);

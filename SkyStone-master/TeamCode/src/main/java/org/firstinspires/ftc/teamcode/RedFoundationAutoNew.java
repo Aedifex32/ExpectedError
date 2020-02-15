@@ -29,6 +29,8 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -65,6 +67,8 @@ public class RedFoundationAutoNew extends LinearOpMode {
     static final double     FORWARD_SPEED = 0.75;
     static final double     BACKWARD_SPEED = -0.75;
     static final double     TURN_SPEED    = 0.6;
+    float hsvValues[] = {0F, 0F, 0F};
+    final double SCALE_FACTOR = 255;
 
     @Override
     public void runOpMode() {
@@ -83,6 +87,11 @@ public class RedFoundationAutoNew extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
+        //Set hsv to grey tile for later use
+        Color.RGBToHSV((int) (robotMap.colourSensor.red() * SCALE_FACTOR),
+                (int) (robotMap.colourSensor.green() * SCALE_FACTOR),
+                (int) (robotMap.colourSensor.blue() * SCALE_FACTOR),
+                hsvValues);
         //move off of wall
         driveTrain.FRMotor.setPower(BACKWARD_SPEED);
         driveTrain.BRMotor.setPower(BACKWARD_SPEED);
@@ -147,9 +156,14 @@ public class RedFoundationAutoNew extends LinearOpMode {
         driveTrain.FLMotor.setPower(0);
         driveTrain.BLMotor.setPower(0);
         //strafe right to line
-        double angle2 = Math.atan2(-1 , 0) * (180 / Math.PI);
-        DriveTrain.drivePolar(magnitude, angle2, rotation, invertDrive, percentSpeed);
-        sleep(3000);
+        double angle2 = Math.atan2(1 , 0) * (180 / Math.PI);
+        while(robotMap.colourSensor.red() < 320 && hsvValues[0] > 60){
+            Color.RGBToHSV((int) (robotMap.colourSensor.red() * SCALE_FACTOR),
+                    (int) (robotMap.colourSensor.green() * SCALE_FACTOR),
+                    (int) (robotMap.colourSensor.blue() * SCALE_FACTOR),
+                    hsvValues);
+            DriveTrain.drivePolar(magnitude, angle2, rotation, invertDrive, percentSpeed);
+        }
         //stop motion and end autonomous
         driveTrain.FRMotor.setPower(0);
         driveTrain.BRMotor.setPower(0);
