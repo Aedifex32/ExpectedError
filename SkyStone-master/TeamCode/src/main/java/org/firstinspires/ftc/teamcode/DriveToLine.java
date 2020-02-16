@@ -56,8 +56,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Red Foundation (Red Alliance)", group="Pushbot")
-public class RedFoundationAutoNew extends LinearOpMode {
+@Autonomous(name="Drive To Line", group="Pushbot")
+public class DriveToLine extends LinearOpMode {
 
     /* Declare OpMode members. */
     DriveTrain driveTrain = new DriveTrain();
@@ -69,13 +69,6 @@ public class RedFoundationAutoNew extends LinearOpMode {
     static final double     TURN_SPEED    = 0.6;
     float hsvValues[] = {0F, 0F, 0F};
     final double SCALE_FACTOR = 255;
-    double magnitude = 1;
-    double angleR = Math.atan2(1 , 0) * (180 / Math.PI);
-    double angleL = Math.atan2(-1 , -0.25) * (180 / Math.PI);
-    double rotationR = 0;
-    double rotationL = -0.5;
-    double invertDrive = 1;
-    double percentSpeed = 0.75;
 
     @Override
     public void runOpMode() {
@@ -99,59 +92,17 @@ public class RedFoundationAutoNew extends LinearOpMode {
                 (int) (robotMap.colourSensor.green() * SCALE_FACTOR),
                 (int) (robotMap.colourSensor.blue() * SCALE_FACTOR),
                 hsvValues);
-        //move off of wall
-        driveTrain.FRMotor.setPower(BACKWARD_SPEED);
-        driveTrain.BRMotor.setPower(BACKWARD_SPEED);
-        driveTrain.FLMotor.setPower(BACKWARD_SPEED);
-        driveTrain.BLMotor.setPower(BACKWARD_SPEED);
-        sleep(500);
-        //stop motion
-        driveTrain.FRMotor.setPower(0);
-        driveTrain.BRMotor.setPower(0);
-        driveTrain.FLMotor.setPower(0);
-        driveTrain.BLMotor.setPower(0);
-        sleep(500);
-        //strafe left
+
+
+        double magnitude = 1;
+        double angleR = Math.atan2(-1 , 0) * (180 / Math.PI);
+        double angleL = Math.atan2(1 , -0.25) * (180 / Math.PI);
+        double rotationR = 0;
+        double rotationL = -0.5;
+        double invertDrive = 1;
+        double percentSpeed = 0.5;
+
         DriveTrain.drivePolar(magnitude, angleL, rotationL, invertDrive, percentSpeed);
-        sleep(1500);
-        //stop motion
-        driveTrain.FRMotor.setPower(0);
-        driveTrain.BRMotor.setPower(0);
-        driveTrain.FLMotor.setPower(0);
-        driveTrain.BLMotor.setPower(0);
-        sleep(500);
-        //drive to foundation
-        driveTrain.FRMotor.setPower(BACKWARD_SPEED);
-        driveTrain.BRMotor.setPower(BACKWARD_SPEED);
-        driveTrain.FLMotor.setPower(BACKWARD_SPEED);
-        driveTrain.BLMotor.setPower(BACKWARD_SPEED);
-        sleep(2500);
-        //hook onto foundation
-        robotMap.rightGate.setPosition(0.5);
-        robotMap.leftGate.setPosition(0.4);
-        sleep(1000);
-        //move towards wall
-        driveTrain.FRMotor.setPower(FORWARD_SPEED);
-        driveTrain.BRMotor.setPower(FORWARD_SPEED);
-        driveTrain.FLMotor.setPower(FORWARD_SPEED);
-        driveTrain.BLMotor.setPower(FORWARD_SPEED);
-        sleep(2000);
-        //stop motion
-        driveTrain.FRMotor.setPower(0);
-        driveTrain.BRMotor.setPower(0);
-        driveTrain.FLMotor.setPower(0);
-        driveTrain.BLMotor.setPower(0);
-        sleep(500);
-        //release foundation
-        robotMap.rightGate.setPosition(1);
-        robotMap.leftGate.setPosition(0);
-        sleep(1000);
-        //strafe right to line
-        DriveTrain.drivePolar(magnitude, angleR, rotationR, invertDrive, 0.5);
-        sleep(1000);
-        //slow down
-        DriveTrain.drivePolar(magnitude, angleR, rotationR, invertDrive, 0.25);
-        //wait for line to be detected
         while(robotMap.colourSensor.red() < 280 && hsvValues[0] > 80){
             Color.RGBToHSV((int) (robotMap.colourSensor.red() * SCALE_FACTOR),
                     (int) (robotMap.colourSensor.green() * SCALE_FACTOR),

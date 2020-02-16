@@ -57,7 +57,8 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Blue Foundation (Blue Alliance)", group="Pushbot")
+@Autonomous(name="Blue Foundation (Old)", group="Pushbot")
+@Disabled
 public class BlueFoundationAuto extends LinearOpMode {
 
     /* Declare OpMode members. */

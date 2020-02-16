@@ -56,8 +56,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Red Foundation (Red Alliance)", group="Pushbot")
-public class RedFoundationAutoNew extends LinearOpMode {
+@Autonomous(name="Blue Foundation (Blue Alliance)", group="Pushbot")
+public class BlueFoundationAutoNew extends LinearOpMode {
 
     /* Declare OpMode members. */
     DriveTrain driveTrain = new DriveTrain();
@@ -111,8 +111,8 @@ public class RedFoundationAutoNew extends LinearOpMode {
         driveTrain.FLMotor.setPower(0);
         driveTrain.BLMotor.setPower(0);
         sleep(500);
-        //strafe left
-        DriveTrain.drivePolar(magnitude, angleL, rotationL, invertDrive, percentSpeed);
+        //strafe right
+        DriveTrain.drivePolar(magnitude, angleR, rotationR, invertDrive, percentSpeed);
         sleep(1500);
         //stop motion
         driveTrain.FRMotor.setPower(0);
@@ -146,11 +146,11 @@ public class RedFoundationAutoNew extends LinearOpMode {
         robotMap.rightGate.setPosition(1);
         robotMap.leftGate.setPosition(0);
         sleep(1000);
-        //strafe right to line
-        DriveTrain.drivePolar(magnitude, angleR, rotationR, invertDrive, 0.5);
+        //strafe left to line
+        DriveTrain.drivePolar(magnitude, angleL, rotationL, invertDrive, 0.5);
         sleep(1000);
         //slow down
-        DriveTrain.drivePolar(magnitude, angleR, rotationR, invertDrive, 0.25);
+        DriveTrain.drivePolar(magnitude, angleL, rotationL, invertDrive, 0.25);
         //wait for line to be detected
         while(robotMap.colourSensor.red() < 280 && hsvValues[0] > 80){
             Color.RGBToHSV((int) (robotMap.colourSensor.red() * SCALE_FACTOR),
