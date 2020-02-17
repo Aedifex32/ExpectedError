@@ -64,8 +64,8 @@ public class DriveToLine extends LinearOpMode {
     RobotMap robotMap = new RobotMap();
     private ElapsedTime     runtime = new ElapsedTime();
 
-    static final double     FORWARD_SPEED = 0.75;
-    static final double     BACKWARD_SPEED = -0.75;
+    static final double     FORWARD_SPEED = 0.4;
+    static final double     BACKWARD_SPEED = -0.4;
     static final double     TURN_SPEED    = 0.6;
     float hsvValues[] = {0F, 0F, 0F};
     final double SCALE_FACTOR = 255;
@@ -95,15 +95,15 @@ public class DriveToLine extends LinearOpMode {
 
 
         double magnitude = 1;
-        double angleR = Math.atan2(-1 , 0) * (180 / Math.PI);
-        double angleL = Math.atan2(1 , -0.25) * (180 / Math.PI);
+        double angleR = Math.atan2(1 , 0) * (180 / Math.PI);
+        double angleL = Math.atan2(-1 , -0.25) * (180 / Math.PI);
         double rotationR = 0;
-        double rotationL = -0.5;
+        double rotationL = -0.26;
         double invertDrive = 1;
         double percentSpeed = 0.5;
 
         DriveTrain.drivePolar(magnitude, angleL, rotationL, invertDrive, percentSpeed);
-        while(robotMap.colourSensor.red() < 280 && hsvValues[0] > 80){
+        while(robotMap.colourSensor.blue() < 280 && hsvValues[0] > 80){
             Color.RGBToHSV((int) (robotMap.colourSensor.red() * SCALE_FACTOR),
                     (int) (robotMap.colourSensor.green() * SCALE_FACTOR),
                     (int) (robotMap.colourSensor.blue() * SCALE_FACTOR),

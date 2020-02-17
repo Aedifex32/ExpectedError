@@ -64,16 +64,17 @@ public class BlueFoundationAutoNew extends LinearOpMode {
     RobotMap robotMap = new RobotMap();
     private ElapsedTime     runtime = new ElapsedTime();
 
-    static final double     FORWARD_SPEED = 0.75;
-    static final double     BACKWARD_SPEED = -0.75;
+    static final double     FORWARD_SPEED = 0.4;
+    static final double     BACKWARD_SPEED = -0.4;
+    static final double     FORWARD_SPEED2 = 0.01;
     static final double     TURN_SPEED    = 0.6;
     float hsvValues[] = {0F, 0F, 0F};
     final double SCALE_FACTOR = 255;
     double magnitude = 1;
     double angleR = Math.atan2(1 , 0) * (180 / Math.PI);
     double angleL = Math.atan2(-1 , -0.25) * (180 / Math.PI);
-    double rotationR = 0;
-    double rotationL = -0.5;
+    double rotationR = -0.2;
+    double rotationL = -0.3;
     double invertDrive = 1;
     double percentSpeed = 0.75;
 
@@ -113,7 +114,7 @@ public class BlueFoundationAutoNew extends LinearOpMode {
         sleep(500);
         //strafe right
         DriveTrain.drivePolar(magnitude, angleR, rotationR, invertDrive, percentSpeed);
-        sleep(1500);
+        sleep(860);
         //stop motion
         driveTrain.FRMotor.setPower(0);
         driveTrain.BRMotor.setPower(0);
@@ -125,34 +126,78 @@ public class BlueFoundationAutoNew extends LinearOpMode {
         driveTrain.BRMotor.setPower(BACKWARD_SPEED);
         driveTrain.FLMotor.setPower(BACKWARD_SPEED);
         driveTrain.BLMotor.setPower(BACKWARD_SPEED);
-        sleep(2500);
-        //hook onto foundation
-        robotMap.rightGate.setPosition(0.5);
-        robotMap.leftGate.setPosition(0.4);
-        sleep(1000);
-        //move towards wall
-        driveTrain.FRMotor.setPower(FORWARD_SPEED);
-        driveTrain.BRMotor.setPower(FORWARD_SPEED);
-        driveTrain.FLMotor.setPower(FORWARD_SPEED);
-        driveTrain.BLMotor.setPower(FORWARD_SPEED);
-        sleep(2000);
+        sleep(530);
         //stop motion
         driveTrain.FRMotor.setPower(0);
         driveTrain.BRMotor.setPower(0);
         driveTrain.FLMotor.setPower(0);
         driveTrain.BLMotor.setPower(0);
+        sleep(200);
+        //hook onto foundation
+        robotMap.rightGate.setPosition(0.5);
+        robotMap.leftGate.setPosition(0.4);
+        sleep(490);
+        //move towards wall
+        driveTrain.FRMotor.setPower(FORWARD_SPEED);
+        driveTrain.BRMotor.setPower(FORWARD_SPEED);
+        driveTrain.FLMotor.setPower(FORWARD_SPEED);
+        driveTrain.BLMotor.setPower(FORWARD_SPEED);
+        sleep(720);
+        //stop right side motion to start to turn
+        driveTrain.FLMotor.setPower(0);
+        driveTrain.BLMotor.setPower(0);
+        sleep(1800);
+        //stop motion
+        driveTrain.FRMotor.setPower(0);
+        driveTrain.BRMotor.setPower(0);
         sleep(500);
         //release foundation
         robotMap.rightGate.setPosition(1);
         robotMap.leftGate.setPosition(0);
-        sleep(1000);
-        //strafe left to line
-        DriveTrain.drivePolar(magnitude, angleL, rotationL, invertDrive, 0.5);
-        sleep(1000);
-        //slow down
-        DriveTrain.drivePolar(magnitude, angleL, rotationL, invertDrive, 0.25);
+        sleep(500);
+        //stop motion
+        driveTrain.FRMotor.setPower(0);
+        driveTrain.BRMotor.setPower(0);
+        driveTrain.FLMotor.setPower(0);
+        driveTrain.BLMotor.setPower(0);
+        sleep(200);
+        //push foundation to corner
+        driveTrain.FRMotor.setPower(BACKWARD_SPEED);
+        driveTrain.BRMotor.setPower(BACKWARD_SPEED);
+        driveTrain.FLMotor.setPower(BACKWARD_SPEED);
+        driveTrain.BLMotor.setPower(BACKWARD_SPEED);
+        sleep(600);
+        //stop motion
+        driveTrain.FRMotor.setPower(0);
+        driveTrain.BRMotor.setPower(0);
+        driveTrain.FLMotor.setPower(0);
+        driveTrain.BLMotor.setPower(0);
+        sleep(200);
+        //move away from the foundation an inch or so
+        driveTrain.FRMotor.setPower(FORWARD_SPEED);
+        driveTrain.BRMotor.setPower(FORWARD_SPEED);
+        driveTrain.FLMotor.setPower(FORWARD_SPEED);
+        driveTrain.BLMotor.setPower(FORWARD_SPEED);
+        sleep(200);
+        //drive to skybridge
+        driveTrain.FRMotor.setPower(FORWARD_SPEED);
+        driveTrain.BRMotor.setPower(FORWARD_SPEED);
+        driveTrain.FLMotor.setPower(FORWARD_SPEED);
+        driveTrain.BLMotor.setPower(FORWARD_SPEED);
+        sleep(500);
+        //stop motion
+        driveTrain.FRMotor.setPower(0);
+        driveTrain.BRMotor.setPower(0);
+        driveTrain.FLMotor.setPower(0);
+        driveTrain.BLMotor.setPower(0);
+        sleep(200);
+        //slow down for color sensor
+        driveTrain.FRMotor.setPower(FORWARD_SPEED2);
+        driveTrain.BRMotor.setPower(FORWARD_SPEED2);
+        driveTrain.FLMotor.setPower(FORWARD_SPEED2);
+        driveTrain.BLMotor.setPower(FORWARD_SPEED2);
         //wait for line to be detected
-        while(robotMap.colourSensor.red() < 280 && hsvValues[0] > 80){
+        while(robotMap.colourSensor.blue() < 280 && hsvValues[0] > 80){
             Color.RGBToHSV((int) (robotMap.colourSensor.red() * SCALE_FACTOR),
                     (int) (robotMap.colourSensor.green() * SCALE_FACTOR),
                     (int) (robotMap.colourSensor.blue() * SCALE_FACTOR),

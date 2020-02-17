@@ -66,7 +66,7 @@ public class MecanumDriveRevamp extends LinearOpMode {
     double direction_y;
     double direction_x;
     double rotation;
-    double DEADZONE = 0.1;
+    double DEADZONE = 0.3;
     double magnitude;
     double angle;
     double invertDrive = 1;
@@ -100,8 +100,8 @@ public class MecanumDriveRevamp extends LinearOpMode {
             DriveTrain.drivePolar(magnitude, angle, rotation, invertDrive, percentSpeed);
 
             if (gamepad2.x) {
-                robotMap.leftClaw.setPosition(0.6);
-                robotMap.rightClaw.setPosition(0.4);
+                robotMap.leftClaw.setPosition(0.4);
+                robotMap.rightClaw.setPosition(0.6);
             } else {
                 robotMap.leftClaw.setPosition(1);
                 robotMap.rightClaw.setPosition(0);
@@ -119,7 +119,7 @@ public class MecanumDriveRevamp extends LinearOpMode {
                 robotMap.rightSlide.setPower(0);
             }
 
-            if (gamepad2.a) {
+            if (gamepad2.dpad_down) {
                 robotMap.hookLeft.setPosition(0.6);
                 robotMap.hookRight.setPosition(0.5);
             } else {
@@ -127,7 +127,7 @@ public class MecanumDriveRevamp extends LinearOpMode {
                 robotMap.hookRight.setPosition(0);
             }
 
-            if (gamepad2.dpad_down) {
+            if (gamepad2.a) {
                 robotMap.pinchRight.setPosition(0);
             } else {
                 robotMap.pinchRight.setPosition(0.9);

@@ -64,8 +64,8 @@ public class RedFoundationAutoNew extends LinearOpMode {
     RobotMap robotMap = new RobotMap();
     private ElapsedTime     runtime = new ElapsedTime();
 
-    static final double     FORWARD_SPEED = 0.75;
-    static final double     BACKWARD_SPEED = -0.75;
+    static final double     FORWARD_SPEED = 0.4;
+    static final double     BACKWARD_SPEED = -0.4;
     static final double     TURN_SPEED    = 0.6;
     float hsvValues[] = {0F, 0F, 0F};
     final double SCALE_FACTOR = 255;
@@ -73,7 +73,7 @@ public class RedFoundationAutoNew extends LinearOpMode {
     double angleR = Math.atan2(1 , 0) * (180 / Math.PI);
     double angleL = Math.atan2(-1 , -0.25) * (180 / Math.PI);
     double rotationR = 0;
-    double rotationL = -0.5;
+    double rotationL = -.25;
     double invertDrive = 1;
     double percentSpeed = 0.75;
 
@@ -113,7 +113,7 @@ public class RedFoundationAutoNew extends LinearOpMode {
         sleep(500);
         //strafe left
         DriveTrain.drivePolar(magnitude, angleL, rotationL, invertDrive, percentSpeed);
-        sleep(1500);
+        sleep(850);
         //stop motion
         driveTrain.FRMotor.setPower(0);
         driveTrain.BRMotor.setPower(0);
@@ -125,17 +125,23 @@ public class RedFoundationAutoNew extends LinearOpMode {
         driveTrain.BRMotor.setPower(BACKWARD_SPEED);
         driveTrain.FLMotor.setPower(BACKWARD_SPEED);
         driveTrain.BLMotor.setPower(BACKWARD_SPEED);
-        sleep(2500);
+        sleep(530);
+        //stop motion
+        driveTrain.FRMotor.setPower(0);
+        driveTrain.BRMotor.setPower(0);
+        driveTrain.FLMotor.setPower(0);
+        driveTrain.BLMotor.setPower(0);
+        sleep(200);
         //hook onto foundation
         robotMap.rightGate.setPosition(0.5);
         robotMap.leftGate.setPosition(0.4);
-        sleep(1000);
+        sleep(490);
         //move towards wall
         driveTrain.FRMotor.setPower(FORWARD_SPEED);
         driveTrain.BRMotor.setPower(FORWARD_SPEED);
         driveTrain.FLMotor.setPower(FORWARD_SPEED);
         driveTrain.BLMotor.setPower(FORWARD_SPEED);
-        sleep(2000);
+        sleep(1200);
         //stop motion
         driveTrain.FRMotor.setPower(0);
         driveTrain.BRMotor.setPower(0);
@@ -146,6 +152,15 @@ public class RedFoundationAutoNew extends LinearOpMode {
         robotMap.rightGate.setPosition(1);
         robotMap.leftGate.setPosition(0);
         sleep(1000);
+        //stop motion
+        driveTrain.FRMotor.setPower(0);
+        driveTrain.BRMotor.setPower(0);
+        driveTrain.FLMotor.setPower(0);
+        driveTrain.BLMotor.setPower(0);
+        sleep(500);
+        //(alternative)strafe right to line
+        //DriveTrain.drivePolar(magnitude, angleR, rotationR, invertDrive, 0.5);
+        //sleep(1600);
         //strafe right to line
         DriveTrain.drivePolar(magnitude, angleR, rotationR, invertDrive, 0.5);
         sleep(1000);
@@ -158,6 +173,18 @@ public class RedFoundationAutoNew extends LinearOpMode {
                     (int) (robotMap.colourSensor.blue() * SCALE_FACTOR),
                     hsvValues);
         }
+        //stop motion
+        driveTrain.FRMotor.setPower(0);
+        driveTrain.BRMotor.setPower(0);
+        driveTrain.FLMotor.setPower(0);
+        driveTrain.BLMotor.setPower(0);
+        sleep(500);
+        //move towards wall
+        driveTrain.FRMotor.setPower(FORWARD_SPEED);
+        driveTrain.BRMotor.setPower(FORWARD_SPEED);
+        driveTrain.FLMotor.setPower(FORWARD_SPEED);
+        driveTrain.BLMotor.setPower(FORWARD_SPEED);
+        sleep(300);
         //stop motion and end autonomous
         driveTrain.FRMotor.setPower(0);
         driveTrain.BRMotor.setPower(0);
