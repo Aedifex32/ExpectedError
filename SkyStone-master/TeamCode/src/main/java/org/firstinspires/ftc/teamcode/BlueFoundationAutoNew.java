@@ -197,7 +197,7 @@ public class BlueFoundationAutoNew extends LinearOpMode {
         driveTrain.FLMotor.setPower(FORWARD_SPEED2);
         driveTrain.BLMotor.setPower(FORWARD_SPEED2);
         //wait for line to be detected
-        while(robotMap.colourSensor.blue() < 280 && hsvValues[0] > 80){
+        while(robotMap.colourSensor.blue() < 280 && hsvValues[0] < 160){
             Color.RGBToHSV((int) (robotMap.colourSensor.red() * SCALE_FACTOR),
                     (int) (robotMap.colourSensor.green() * SCALE_FACTOR),
                     (int) (robotMap.colourSensor.blue() * SCALE_FACTOR),

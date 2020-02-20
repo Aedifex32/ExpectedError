@@ -29,9 +29,13 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
@@ -82,7 +86,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
  */
 
 
-@TeleOp(name="SKYSTONE Vuforia Nav", group ="Concept")
+@Autonomous (name="SKYSTONE Vuforia Nav", group ="Concept")
 public class ConceptVuforiaSkyStoneNavigation extends LinearOpMode {
 
     // IMPORTANT:  For Phone Camera, set 1) the camera source and 2) the orientation, based on how your phone is mounted:
@@ -92,7 +96,10 @@ public class ConceptVuforiaSkyStoneNavigation extends LinearOpMode {
     // NOTE: If you are running on a CONTROL HUB, with only one USB WebCam, you must select CAMERA_CHOICE = BACK; and PHONE_IS_PORTRAIT = false;
     //
     private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
-    private static final boolean PHONE_IS_PORTRAIT = false  ;
+    private static final boolean PHONE_IS_PORTRAIT = false;
+    DriveTrain driveTrain = new DriveTrain();
+    RobotMap robotMap = new RobotMap();
+    private ElapsedTime runtime = new ElapsedTime();
 
     /*
      * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
@@ -136,7 +143,22 @@ public class ConceptVuforiaSkyStoneNavigation extends LinearOpMode {
     private float phoneYRotate    = 0;
     private float phoneZRotate    = 0;
 
+    float hsvValues[] = {0F, 0F, 0F};
+    final double SCALE_FACTOR = 255;
+    double magnitude = 1;
+    double angleR = Math.atan2(1 , 0) * (180 / Math.PI);
+    double angleL = Math.atan2(-1 , -0.25) * (180 / Math.PI);
+    double rotationR = 0;
+    double rotationL = -.25;
+    double invertDrive = 1;
+    double percentSpeed = 0.75;
+    static final double     FORWARD_SPEED = 0.4;
+    static final double     BACKWARD_SPEED = -0.4;
+
     @Override public void runOpMode() {
+
+        driveTrain.init(hardwareMap);
+        robotMap.init(hardwareMap);
         /*
          * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
          * We can pass Vuforia the handle to a camera preview resource (on the RC phone);
@@ -310,15 +332,60 @@ public class ConceptVuforiaSkyStoneNavigation extends LinearOpMode {
         // CONSEQUENTLY do not put any driving commands in this loop.
         // To restore the normal opmode structure, just un-comment the following line:
 
-        // waitForStart();
+        waitForStart();
 
         // Note: To use the remote camera preview:
         // AFTER you hit Init on the Driver Station, use the "options menu" to select "Camera Stream"
         // Tap the preview window to receive a fresh image.
-
+        //strafe right to line
+        //move off of wall
+        driveTrain.FRMotor.setPower(BACKWARD_SPEED);
+        driveTrain.BRMotor.setPower(BACKWARD_SPEED);
+        driveTrain.FLMotor.setPower(BACKWARD_SPEED);
+        driveTrain.BLMotor.setPower(BACKWARD_SPEED);
+        sleep(500);
+        //stop motion
+        driveTrain.FRMotor.setPower(0);
+        driveTrain.BRMotor.setPower(0);
+        driveTrain.FLMotor.setPower(0);
+        driveTrain.BLMotor.setPower(0);
+        sleep(250);
+        //strafe right to loading zone
+        DriveTrain.drivePolar(magnitude, angleR, rotationR, invertDrive, 0.5);
+        sleep(750);
+        //slow down
+        DriveTrain.drivePolar(magnitude, angleR, rotationR, invertDrive, 0.25);
+        //wait for line to be detected
+        while(robotMap.colourSensor.red() < 280 && hsvValues[0] < 160){
+            Color.RGBToHSV((int) (robotMap.colourSensor.red() * SCALE_FACTOR),
+                    (int) (robotMap.colourSensor.green() * SCALE_FACTOR),
+                    (int) (robotMap.colourSensor.blue() * SCALE_FACTOR),
+                    hsvValues);
+        }
+        //wait one second
+        sleep(1000);
+        //stop motion
+        driveTrain.FRMotor.setPower(0);
+        driveTrain.BRMotor.setPower(0);
+        driveTrain.FLMotor.setPower(0);
+        driveTrain.BLMotor.setPower(0);
+        sleep(250);
+        //drive forward to be 3 inches from row of stones
+        driveTrain.FRMotor.setPower(BACKWARD_SPEED);
+        driveTrain.BRMotor.setPower(BACKWARD_SPEED);
+        driveTrain.FLMotor.setPower(BACKWARD_SPEED);
+        driveTrain.BLMotor.setPower(BACKWARD_SPEED);
+        sleep(1500);
+        //stop motion
+        driveTrain.FRMotor.setPower(0);
+        driveTrain.BRMotor.setPower(0);
+        driveTrain.FLMotor.setPower(0);
+        driveTrain.BLMotor.setPower(0);
+        sleep(250);
+        //start to strafe left
+        DriveTrain.drivePolar(magnitude, angleL, rotationL, invertDrive, percentSpeed);
         targetsSkyStone.activate();
         while (!isStopRequested()) {
-
             // check all the trackable targets to see which one (if any) is visible.
             targetVisible = false;
             for (VuforiaTrackable trackable : allTrackables) {
@@ -338,6 +405,11 @@ public class ConceptVuforiaSkyStoneNavigation extends LinearOpMode {
 
             // Provide feedback as to where the robot is located (if we know).
             if (targetVisible) {
+                //stop motion
+                driveTrain.FRMotor.setPower(0);
+                driveTrain.BRMotor.setPower(0);
+                driveTrain.FLMotor.setPower(0);
+                driveTrain.BLMotor.setPower(0);
                 // express position (translation) of robot in inches.
                 VectorF translation = lastLocation.getTranslation();
                 telemetry.addData("Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
@@ -346,6 +418,17 @@ public class ConceptVuforiaSkyStoneNavigation extends LinearOpMode {
                 // express the rotation of the robot in degrees.
                 Orientation rotation = Orientation.getOrientation(lastLocation, EXTRINSIC, XYZ, DEGREES);
                 telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
+                while(Math.abs(translation.get(0)) > 5){
+                    //strafe super slowly
+                    DriveTrain.drivePolar(magnitude, angleL, rotationL, invertDrive, 0.1);
+                }
+                //stop motion
+                driveTrain.FRMotor.setPower(0);
+                driveTrain.BRMotor.setPower(0);
+                driveTrain.FLMotor.setPower(0);
+                driveTrain.BLMotor.setPower(0);
+                sleep(250);
+                break;
             }
             else {
                 telemetry.addData("Visible Target", "none");
@@ -355,5 +438,73 @@ public class ConceptVuforiaSkyStoneNavigation extends LinearOpMode {
 
         // Disable Tracking when we are done;
         targetsSkyStone.deactivate();
+        //set pinch arm
+        robotMap.pinchRight.setPosition(0);
+        sleep(500);
+        robotMap.hookLeft.setPosition(0.6);
+        robotMap.hookRight.setPosition(0.5);
+        sleep(500);
+        //lift pinch arm
+        robotMap.pinchRight.setPosition(0.9);
+        sleep(250);
+        //back away from stones
+        //move towards wall
+        driveTrain.FRMotor.setPower(FORWARD_SPEED);
+        driveTrain.BRMotor.setPower(FORWARD_SPEED);
+        driveTrain.FLMotor.setPower(FORWARD_SPEED);
+        driveTrain.BLMotor.setPower(FORWARD_SPEED);
+        sleep(750);
+        //stop motion
+        driveTrain.FRMotor.setPower(0);
+        driveTrain.BRMotor.setPower(0);
+        driveTrain.FLMotor.setPower(0);
+        driveTrain.BLMotor.setPower(0);
+        sleep(250);
+        //turn 90 degrees to right
+        driveTrain.FRMotor.setPower(FORWARD_SPEED);
+        driveTrain.BRMotor.setPower(FORWARD_SPEED);
+        driveTrain.FLMotor.setPower(BACKWARD_SPEED);
+        driveTrain.BLMotor.setPower(BACKWARD_SPEED);
+        sleep(750);
+        //stop motion
+        driveTrain.FRMotor.setPower(0);
+        driveTrain.BRMotor.setPower(0);
+        driveTrain.FLMotor.setPower(0);
+        driveTrain.BLMotor.setPower(0);
+        sleep(250);
+        //drive to foundation
+        driveTrain.FRMotor.setPower(BACKWARD_SPEED);
+        driveTrain.BRMotor.setPower(BACKWARD_SPEED);
+        driveTrain.FLMotor.setPower(BACKWARD_SPEED);
+        driveTrain.BLMotor.setPower(BACKWARD_SPEED);
+        sleep(3200);
+        //stop motion
+        driveTrain.FRMotor.setPower(0);
+        driveTrain.BRMotor.setPower(0);
+        driveTrain.FLMotor.setPower(0);
+        driveTrain.BLMotor.setPower(0);
+        sleep(250);
+        //release block
+        robotMap.hookLeft.setPosition(0.9);
+        robotMap.hookRight.setPosition(0);
+        sleep(500);
+        //back up to line
+        driveTrain.FRMotor.setPower(FORWARD_SPEED);
+        driveTrain.BRMotor.setPower(FORWARD_SPEED);
+        driveTrain.FLMotor.setPower(FORWARD_SPEED);
+        driveTrain.BLMotor.setPower(FORWARD_SPEED);
+        //wait for line to be detected
+        while(robotMap.colourSensor.red() < 280 && hsvValues[0] > 80) {
+            Color.RGBToHSV((int) (robotMap.colourSensor.red() * SCALE_FACTOR),
+                    (int) (robotMap.colourSensor.green() * SCALE_FACTOR),
+                    (int) (robotMap.colourSensor.blue() * SCALE_FACTOR),
+                    hsvValues);
+        }
+        //stop motion and end autonomous
+        driveTrain.FRMotor.setPower(0);
+        driveTrain.BRMotor.setPower(0);
+        driveTrain.FLMotor.setPower(0);
+        driveTrain.BLMotor.setPower(0);
+        sleep(250);
     }
 }
