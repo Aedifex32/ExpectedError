@@ -32,9 +32,7 @@ package org.firstinspires.ftc.teamcode;
 import android.graphics.Color;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -86,8 +84,8 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
  */
 
 
-@Autonomous (name="SKYSTONE Vuforia Nav", group ="Concept")
-public class ConceptVuforiaSkyStoneNavigation extends LinearOpMode {
+@Autonomous (name="Red Depot (Blue Alliance)", group ="Pushbot")
+public class BlueStoneSideAuto extends LinearOpMode {
 
     // IMPORTANT:  For Phone Camera, set 1) the camera source and 2) the orientation, based on how your phone is mounted:
     // 1) Camera Source.  Valid choices are:  BACK (behind screen) or FRONT (selfie side)
@@ -153,6 +151,7 @@ public class ConceptVuforiaSkyStoneNavigation extends LinearOpMode {
     double invertDrive = 1;
     double percentSpeed = 0.75;
     static final double     FORWARD_SPEED = 0.4;
+    static final double     FORWARD_SPEED2 = 0.01;
     static final double     BACKWARD_SPEED = -0.4;
 
     @Override public void runOpMode() {
@@ -313,9 +312,9 @@ public class ConceptVuforiaSkyStoneNavigation extends LinearOpMode {
 
         // Next, translate the camera lens to where it is on the robot.
         // In this example, it is centered (left to right), but forward of the middle of the robot, and above ground level.
-        final float CAMERA_FORWARD_DISPLACEMENT  = 8.0f * mmPerInch;   // eg: Camera is 8 Inches in front of robot center
-        final float CAMERA_VERTICAL_DISPLACEMENT = 4.0f * mmPerInch;   // eg: Camera is 4 Inches above ground
-        final float CAMERA_LEFT_DISPLACEMENT     = 0;     // eg: Camera is ON the robot's center line
+        final float CAMERA_FORWARD_DISPLACEMENT  = 9.0f * mmPerInch;   // eg: Camera is 9 Inches in front of robot center
+        final float CAMERA_VERTICAL_DISPLACEMENT = 6.9f * mmPerInch;   // eg: Camera is 6.9 Inches above ground
+        final float CAMERA_LEFT_DISPLACEMENT     = 2.5f * mmPerInch;   // eg: Camera is 2.5 Inches to the left of robot's center line
 
         OpenGLMatrix robotFromCamera = OpenGLMatrix
                     .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
@@ -337,33 +336,39 @@ public class ConceptVuforiaSkyStoneNavigation extends LinearOpMode {
         // Note: To use the remote camera preview:
         // AFTER you hit Init on the Driver Station, use the "options menu" to select "Camera Stream"
         // Tap the preview window to receive a fresh image.
-        //strafe right to line
+
+        //Set hsv to grey tile for later use
+        Color.RGBToHSV((int) (robotMap.colourSensor.red() * SCALE_FACTOR),
+                (int) (robotMap.colourSensor.green() * SCALE_FACTOR),
+                (int) (robotMap.colourSensor.blue() * SCALE_FACTOR),
+                hsvValues);
+
         //move off of wall
         driveTrain.FRMotor.setPower(BACKWARD_SPEED);
         driveTrain.BRMotor.setPower(BACKWARD_SPEED);
         driveTrain.FLMotor.setPower(BACKWARD_SPEED);
         driveTrain.BLMotor.setPower(BACKWARD_SPEED);
-        sleep(500);
+        sleep(100);
         //stop motion
         driveTrain.FRMotor.setPower(0);
         driveTrain.BRMotor.setPower(0);
         driveTrain.FLMotor.setPower(0);
         driveTrain.BLMotor.setPower(0);
         sleep(250);
-        //strafe right to loading zone
-        DriveTrain.drivePolar(magnitude, angleR, rotationR, invertDrive, 0.5);
+        //strafe left to loading zone
+        DriveTrain.drivePolar(magnitude, angleL, rotationL, invertDrive, 0.5);
         sleep(750);
         //slow down
         DriveTrain.drivePolar(magnitude, angleR, rotationR, invertDrive, 0.25);
         //wait for line to be detected
-        while(robotMap.colourSensor.red() < 280 && hsvValues[0] < 160){
+        while(robotMap.colourSensor.red() < 280 && hsvValues[0] > 80){
             Color.RGBToHSV((int) (robotMap.colourSensor.red() * SCALE_FACTOR),
                     (int) (robotMap.colourSensor.green() * SCALE_FACTOR),
                     (int) (robotMap.colourSensor.blue() * SCALE_FACTOR),
                     hsvValues);
         }
-        //wait one second
-        sleep(1000);
+        //wait 3/4 second
+        sleep(750);
         //stop motion
         driveTrain.FRMotor.setPower(0);
         driveTrain.BRMotor.setPower(0);
@@ -375,15 +380,15 @@ public class ConceptVuforiaSkyStoneNavigation extends LinearOpMode {
         driveTrain.BRMotor.setPower(BACKWARD_SPEED);
         driveTrain.FLMotor.setPower(BACKWARD_SPEED);
         driveTrain.BLMotor.setPower(BACKWARD_SPEED);
-        sleep(1500);
+        sleep(1000);
         //stop motion
         driveTrain.FRMotor.setPower(0);
         driveTrain.BRMotor.setPower(0);
         driveTrain.FLMotor.setPower(0);
         driveTrain.BLMotor.setPower(0);
         sleep(250);
-        //start to strafe left
-        DriveTrain.drivePolar(magnitude, angleL, rotationL, invertDrive, percentSpeed);
+        //start to strafe right
+        DriveTrain.drivePolar(magnitude, angleR, rotationR, invertDrive, percentSpeed/3);
         targetsSkyStone.activate();
         while (!isStopRequested()) {
             // check all the trackable targets to see which one (if any) is visible.
@@ -420,7 +425,7 @@ public class ConceptVuforiaSkyStoneNavigation extends LinearOpMode {
                 telemetry.addData("Rot (deg)", "{Roll, Pitch, Heading} = %.0f, %.0f, %.0f", rotation.firstAngle, rotation.secondAngle, rotation.thirdAngle);
                 while(Math.abs(translation.get(0)) > 5){
                     //strafe super slowly
-                    DriveTrain.drivePolar(magnitude, angleL, rotationL, invertDrive, 0.1);
+                    DriveTrain.drivePolar(magnitude, angleR, rotationR, invertDrive, 0.1);
                 }
                 //stop motion
                 driveTrain.FRMotor.setPower(0);
@@ -453,18 +458,18 @@ public class ConceptVuforiaSkyStoneNavigation extends LinearOpMode {
         driveTrain.BRMotor.setPower(FORWARD_SPEED);
         driveTrain.FLMotor.setPower(FORWARD_SPEED);
         driveTrain.BLMotor.setPower(FORWARD_SPEED);
-        sleep(750);
+        sleep(600);
         //stop motion
         driveTrain.FRMotor.setPower(0);
         driveTrain.BRMotor.setPower(0);
         driveTrain.FLMotor.setPower(0);
         driveTrain.BLMotor.setPower(0);
         sleep(250);
-        //turn 90 degrees to right
-        driveTrain.FRMotor.setPower(FORWARD_SPEED);
-        driveTrain.BRMotor.setPower(FORWARD_SPEED);
-        driveTrain.FLMotor.setPower(BACKWARD_SPEED);
-        driveTrain.BLMotor.setPower(BACKWARD_SPEED);
+        //turn 90 degrees to left
+        driveTrain.FRMotor.setPower(BACKWARD_SPEED);
+        driveTrain.BRMotor.setPower(BACKWARD_SPEED);
+        driveTrain.FLMotor.setPower(FORWARD_SPEED);
+        driveTrain.BLMotor.setPower(FORWARD_SPEED);
         sleep(750);
         //stop motion
         driveTrain.FRMotor.setPower(0);
@@ -493,8 +498,14 @@ public class ConceptVuforiaSkyStoneNavigation extends LinearOpMode {
         driveTrain.BRMotor.setPower(FORWARD_SPEED);
         driveTrain.FLMotor.setPower(FORWARD_SPEED);
         driveTrain.BLMotor.setPower(FORWARD_SPEED);
+        sleep(200);
+        //slow down for color sensor
+        driveTrain.FRMotor.setPower(FORWARD_SPEED2);
+        driveTrain.BRMotor.setPower(FORWARD_SPEED2);
+        driveTrain.FLMotor.setPower(FORWARD_SPEED2);
+        driveTrain.BLMotor.setPower(FORWARD_SPEED2);
         //wait for line to be detected
-        while(robotMap.colourSensor.red() < 280 && hsvValues[0] > 80) {
+        while(robotMap.colourSensor.red() < 280 && hsvValues[0] < 160) {
             Color.RGBToHSV((int) (robotMap.colourSensor.red() * SCALE_FACTOR),
                     (int) (robotMap.colourSensor.green() * SCALE_FACTOR),
                     (int) (robotMap.colourSensor.blue() * SCALE_FACTOR),
