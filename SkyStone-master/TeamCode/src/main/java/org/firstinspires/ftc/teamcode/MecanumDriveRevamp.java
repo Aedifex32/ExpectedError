@@ -40,6 +40,9 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 
+import java.util.Timer;
+import java.util.concurrent.TimeUnit;
+
 
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
@@ -61,6 +64,7 @@ public class MecanumDriveRevamp extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
+    private ElapsedTime timer = new ElapsedTime();
     DriveTrain driveTrain = new DriveTrain();
     RobotMap robotMap = new RobotMap();
     double direction_y;
@@ -71,6 +75,8 @@ public class MecanumDriveRevamp extends LinearOpMode {
     double angle;
     double invertDrive = 1;
     double percentSpeed = 1;
+    boolean isFirst = true;
+    double speedPID = 0.0005;
 
     @Override
     public void runOpMode() {
@@ -153,22 +159,36 @@ public class MecanumDriveRevamp extends LinearOpMode {
     //Start of Drive Setup
     protected void doDead() {
 
-        if(Math.abs(direction_x) < DEADZONE){
+        if(Math.abs(gamepad1.left_stick_x) < DEADZONE){
             direction_x = 0;
         }
-        if(Math.abs(direction_y) < DEADZONE){
+        if(Math.abs(-gamepad1.left_stick_y) < DEADZONE){
             direction_y = 0;
         }
-        if(Math.abs(rotation) < DEADZONE){
+        if(Math.abs(gamepad1.right_stick_x) < DEADZONE){
             rotation = 0;
+        }
+        if((Math.abs(-gamepad1.left_stick_y)) < DEADZONE && (Math.abs(gamepad1.left_stick_x)) < DEADZONE){
+            isFirst = true;
         }
     }
 
     protected void getInput() {
-        direction_y = -gamepad1.left_stick_y;
-        direction_x = gamepad1.left_stick_x;
+        if((Math.abs(-gamepad1.left_stick_y)) >= DEADZONE && isFirst){
+            timer.reset();
+            isFirst = false;
+        }
+        if(timer.time() <= 2){
+            direction_y = (-gamepad1.left_stick_y * speedPID * timer.time(TimeUnit.MILLISECONDS));
+            direction_x = (gamepad1.left_stick_x * speedPID * timer.time(TimeUnit.MILLISECONDS));
+        }
+        else {
+            direction_y = -gamepad1.left_stick_y;
+            direction_x = gamepad1.left_stick_x;
+        }
         rotation = gamepad1.right_stick_x;
     }
+
     protected void toPolar() {
         magnitude = Math.sqrt((direction_x * direction_x) + (direction_y * direction_y)); // sqrt(X^2 + Y^2)
         if (magnitude > 1.0) {  // If Magnitude over 1 set it to 1
@@ -176,9 +196,11 @@ public class MecanumDriveRevamp extends LinearOpMode {
         }
         angle = Math.atan2(direction_x , direction_y ) * (180 / Math.PI);  // arctan(y/x) Calculates the angle of the y and x point then converts to radians
     }
+
     protected void doInvert(){
         invertDrive = invertDrive * -1;
     }
+
     protected void setSpeed(){
         if(gamepad1.dpad_down){
             percentSpeed = 0.25;
@@ -190,8 +212,6 @@ public class MecanumDriveRevamp extends LinearOpMode {
             percentSpeed = 1;
         }
     }
-
-
 
     }
     //End of Drive Setup
